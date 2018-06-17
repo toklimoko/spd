@@ -1,0 +1,343 @@
+package com.tomek.akcelerometr;
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Bundle;
+import android.os.PowerManager;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.chart.PointStyle;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.model.XYSeries;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+import org.achartengine.renderer.XYSeriesRenderer;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class MainActivity extends Activity implements SensorEventListener { //implements Sensor... - czujnik
+
+    private SensorManager mySensorManager; //menedzer czujnikow
+    private Sensor myAccelerometer; //obiekt klasy Sensor (czyli czujnik)
+    private boolean pomiar = false; //czy nacisnieto przycisk Start?
+    private boolean marker = false;
+
+    private Button przyciskStart;
+    private TextView poleAx, poleAy, poleAz, poleAt;
+    private EditText poleImie;
+    private EditText poleNazwisko;
+    private String string = "T: \tX: \tY: \tZ: \n" ;
+    private int licznik = 0;
+    private PowerManager.WakeLock mWakeLock;
+
+    private float aX;
+    private float aY;
+    private float aZ;
+    private double aT;
+    private double NS2S = 0.000000001;
+    private double startTime;
+
+    private XYMultipleSeriesDataset dataset;
+    private XYMultipleSeriesRenderer mrenderer;
+
+    private List aXLista = new ArrayList();
+    private List aYLista = new ArrayList();
+    private List aZLista = new ArrayList();
+    private List aTLista = new ArrayList();
+
+
+    private XYSeries xTSeria = new XYSeries("X{t}");
+    private XYSeries yTSeria = new XYSeries("Y(t)");
+    private XYSeries zTSeria = new XYSeries("Z(t)");
+
+//    private LinearLayout chartLayout;
+//    private GraphicalView chartView;
+//
+
+
+    Button buttonStart, buttonStop, buttonSave, buttonReset;
+
+    PowerManager pm;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+
+        mySensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        myAccelerometer = mySensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mySensorManager.registerListener(this, myAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+
+        pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My Tag");
+
+
+        buttonStart = (Button) findViewById(R.id.btnStart);
+        buttonStop = (Button) findViewById(R.id.btnStop);
+        buttonSave = (Button) findViewById(R.id.btnSave);
+        buttonReset = (Button) findViewById(R.id.btnReset);
+
+        buttonStop.setVisibility(View.GONE);
+        buttonSave.setVisibility(View.GONE);
+        buttonReset.setVisibility(View.GONE);
+        buttonStart.setVisibility(View.VISIBLE);
+
+        if(savedInstanceState != null){
+            aX=savedInstanceState.getFloat("aX");
+            aY=savedInstanceState.getFloat("aY");
+            aZ=savedInstanceState.getFloat("aZ");
+            aT=savedInstanceState.getFloat("aT");
+            licznik=savedInstanceState.getInt("licznik");
+            pomiar=savedInstanceState.getBoolean("pomiar");
+            marker=savedInstanceState.getBoolean("marker");
+            string=savedInstanceState.getString("string");
+            startTime=savedInstanceState.getDouble("startTime");
+
+        }
+
+        if (marker){
+            buttonStart.setVisibility(View.GONE);
+            buttonStop.setVisibility(View.VISIBLE);
+            buttonSave.setVisibility(View.GONE);
+            buttonReset.setVisibility(View.GONE);
+            mWakeLock.acquire();
+        }
+
+
+
+
+
+
+
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+
+
+        if (pomiar) {
+
+            int sensorType = sensorEvent.sensor.getType();
+
+            if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) ;
+
+            if (licznik == 0){
+                startTime = sensorEvent.timestamp;
+            }
+
+            aX = sensorEvent.values[0]; //skladowa X przyspieszenia
+            aY = sensorEvent.values[1]; //skladowa Y przyspieszenia
+            aZ = sensorEvent.values[2]; //skladowa Z przyspieszenia
+
+            aT = (sensorEvent.timestamp - startTime)*NS2S; //timestamp z konwersj¹ na sekundy
+
+            poleAx = (TextView) findViewById(R.id.poleAx);
+            poleAy = (TextView) findViewById(R.id.poleAy);
+            poleAz = (TextView) findViewById(R.id.poleAz);
+            poleAt = (TextView) findViewById(R.id.poleAt);
+
+            poleAx.setText(String.valueOf(aX));
+            poleAy.setText(String.valueOf(aY));
+            poleAz.setText(String.valueOf(aZ));
+            poleAt.setText(String.valueOf(aT));
+
+            string = string + aT + "\t" + aX + "\t" + aY + "\t" + aZ +"\n";
+
+
+
+
+            xTSeria.add(aT,aX);
+            yTSeria.add(aT,aY);
+            zTSeria.add(aT,aZ);
+
+            XYSeriesRenderer renderer = new XYSeriesRenderer();
+            renderer.setLineWidth(2);
+            renderer.setColor(Color.BLUE);
+            renderer.setPointStyle(PointStyle.CIRCLE);
+
+
+            XYMultipleSeriesRenderer mrenderer = new XYMultipleSeriesRenderer();
+            mrenderer.addSeriesRenderer(renderer);
+            mrenderer.setYAxisMax(30);
+            mrenderer.setYAxisMin(-30);
+            mrenderer.setShowGrid(true);
+
+            XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+            dataset.addSeries(xTSeria);
+            dataset.addSeries(yTSeria);
+            dataset.addSeries(zTSeria);
+
+            LinearLayout chartLayout = (LinearLayout) findViewById(R.id.chart);
+//            GraphicalView chartView = ChartFactory.getLineChartView(this,dataset,mrenderer);
+//            chartLayout.addView(chartView);
+
+
+            licznik++;
+
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) { //jak na razie nie zwracamy na nia uwagi
+
+    }
+
+    //this - oznacza, ze uzywamy metod onSensorChanged oraz onAccuracyChanged
+    //NS2S - stala, ktora ewentualnie mozna sobie zdefiniowac : 1*10^-9 (nanoseconds to seconds - czas z urzadzenia jest w ns)
+    //w pkt 2 - umozliwianie pomiaru przyspieszen przy wylaczonym ekranie. Trzeba dodac .release(), gdyz jesli tego nie dodamy, to akcelerometr bedzie caly czas dzialal
+
+    public void startWc(View view) {
+        buttonStart.setVisibility(View.GONE);
+        buttonStop.setVisibility(View.VISIBLE);
+        buttonSave.setVisibility(View.GONE);
+        buttonReset.setVisibility(View.GONE);
+        pomiar = true;
+        marker = true;
+        mWakeLock.acquire();
+
+    }
+
+
+    public void stopWc(View view) {
+        if (pomiar) {
+            buttonStart.setVisibility(View.VISIBLE);
+            buttonStop.setVisibility(View.GONE);
+            buttonSave.setVisibility(View.VISIBLE);
+            buttonReset.setVisibility(View.VISIBLE);
+            pomiar = false;
+            marker = false;
+            mWakeLock.release();
+
+
+
+            XYSeriesRenderer renderer = new XYSeriesRenderer();
+            renderer.setLineWidth(2);
+            renderer.setColor(Color.BLUE);
+            renderer.setPointStyle(PointStyle.CIRCLE);
+
+
+            XYMultipleSeriesRenderer mrenderer = new XYMultipleSeriesRenderer();
+            mrenderer.addSeriesRenderer(renderer);
+            mrenderer.setYAxisMax(30);
+            mrenderer.setYAxisMin(-30);
+            mrenderer.setShowGrid(true);
+
+            XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+            dataset.addSeries(xTSeria);
+            dataset.addSeries(yTSeria);
+            dataset.addSeries(zTSeria);
+
+            LinearLayout chartLayout = (LinearLayout) findViewById(R.id.chart);
+//            GraphicalView chartView = ChartFactory.getLineChartView(this,dataset,mrenderer);
+//            chartLayout.addView(chartView);
+
+
+        }
+    }
+
+    public void saveFile(View view){
+        zapiszPlik("/AKCELEROMETR/","pomiar.txt");
+
+
+    }
+
+    private void zapiszPlik(String  folder,String fileName) {
+
+
+
+            File root = android.os.Environment.getExternalStorageDirectory();
+            File dir = new File(root.getAbsolutePath()+ folder); //tworzenie nowego pliku w nowym folderze
+            dir.mkdirs();
+            File file = new File(dir, fileName);
+
+            String test=file.getAbsolutePath();
+            Log.i("My","FILE LOCATION: " + test);
+
+
+            try {
+                FileOutputStream f = new FileOutputStream(file);
+                PrintWriter pw = new PrintWriter(f);
+
+
+                pw.print(string);
+
+                pw.flush();
+                pw.close();
+                f.close();
+
+
+                Toast.makeText(getApplicationContext(),
+
+                        "Data saved",
+
+                        Toast.LENGTH_LONG).show();
+
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Log.i("My", "******* File not found. Did you" +
+                        " add a WRITE_EXTERNAL_STORAGE permission to the manifest?");
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    public void reset(View view) {
+
+        buttonStart.setVisibility(View.VISIBLE);
+        buttonStop.setVisibility(View.GONE);
+        buttonSave.setVisibility(View.GONE);
+        buttonReset.setVisibility(View.GONE);
+
+        poleAx.setText("0.0");
+        poleAy.setText("0.0");
+        poleAz.setText("0.0");
+        poleAt.setText("0.0");
+
+        licznik = 0;
+        string = "T: \tX: \tY: \tZ: \n";
+
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+
+        savedInstanceState.putFloat("aX", Float.parseFloat(String.valueOf(aX)));
+        savedInstanceState.putFloat("aY", Float.parseFloat(String.valueOf(aY)));
+        savedInstanceState.putFloat("aZ", Float.parseFloat(String.valueOf(aZ)));
+        savedInstanceState.putFloat("aT",Float.parseFloat(String.valueOf(aT)));
+        savedInstanceState.putInt("licznik",licznik);
+        savedInstanceState.putBoolean("pomiar", pomiar);
+        savedInstanceState.putBoolean("marker", marker);
+        savedInstanceState.putString("string", string);
+        savedInstanceState.putDouble("startTime", startTime);
+
+    }
+
+}
+

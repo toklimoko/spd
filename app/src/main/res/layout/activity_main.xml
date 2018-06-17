@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.tomek.akcelerometr.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
+
+        <TextView
+            android:id="@+id/tvStart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:text="@string/tv1"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimary"
+            android:textSize="22dp" /> <!-- srodkowanie w starszych wersjach-->
+
+        <TableLayout
+            android:layout_width="220dp"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/textViewt"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/tvt"
+                    android:textAlignment="center" /> <!-- srodkowanie w starszych wersjach-->
+
+                <TextView
+                    android:id="@+id/poleAt"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/zera"
+                    android:textAlignment="center" />
+
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/tv2"
+                    android:textAlignment="center" /> <!-- srodkowanie w starszych wersjach-->
+
+                <TextView
+                    android:id="@+id/poleAx"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/zera"
+                    android:textAlignment="center" />
+
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/tv3"
+                    android:textAlignment="center" /> <!-- srodkowanie w starszych wersjach-->
+
+                <TextView
+                    android:id="@+id/poleAy"
+                    android:layout_width="150dp"
+                    android:layout_height="20dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/zera"
+                    android:textAlignment="center" />
+
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/tv4"
+                    android:textAlignment="center" /> <!-- srodkowanie w starszych wersjach-->
+
+                <TextView
+                    android:id="@+id/poleAz"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/zera"
+                    android:textAlignment="center" />
+
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/tvlktv"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/tvlk"
+                    android:textAlignment="center"
+                    android:textStyle="bold" /> <!-- srodkowanie w starszych wersjach-->
+
+                <TextView
+                    android:id="@+id/poleLK"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="0"
+                    android:textAlignment="center"
+                    android:textStyle="bold" />
+
+
+            </TableRow>
+
+        </TableLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnStart"
+                style="@android:style/Widget.Holo.Button"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:onClick="startWc"
+                android:text="@string/btn1"
+                android:textAlignment="center"
+
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnStop"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:elevation="0dp"
+                android:onClick="stopWc"
+                android:text="@string/btn2"
+                android:textAlignment="center"
+                android:textColor="@android:color/background_light"
+                android:textSize="16sp"
+                android:visibility="visible" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="3dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnSave"
+                style="@android:style/Widget.Holo.Button"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="1.5dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:onClick="saveFile"
+                android:text="@string/btn3"
+                android:textAlignment="center"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnReset"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1.5dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:elevation="0dp"
+                android:onClick="reset"
+                android:text="@string/btn4"
+                android:textAlignment="center"
+                android:textColor="@android:color/background_light"
+                android:textSize="16sp"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/chart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"></LinearLayout>
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
